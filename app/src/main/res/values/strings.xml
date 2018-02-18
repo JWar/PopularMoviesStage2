@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">PopularMovies</string>
+    <string name="menu_main_order_by_most_popular">Most Popular</string>
+    <string name="menu_main_order_by_highest_rated">Highest Rated</string>
+    <string name="movies_item_image_view_desc">Movie Poster Image</string>
+
+    <string name="activity_detail_movie_title_header">Title:</string>
+    <string name="activity_detail_movie_title">Movie Title</string>
+    <string name="activity_detail_movie_release_date_header">Release Date:</string>
+    <string name="activity_detail_movie_release_date">Movie Release Date</string>
+    <string name="activity_detail_movie_vote_average_header">Vote Average:</string>
+    <string name="activity_detail_movie_vote_average">Movie Vote Average</string>
+    <string name="activity_detail_movie_synopsis_header">Synopsis:</string>
+    <string name="activity_detail_movie_synopsis">Movie Synopsis</string>
+
+    <string name="activity_detail_trailers_header">Trailers:</string>
+    <string name="activity_detail_trailer">Trailer</string>
+    <string name="activity_detail_reviews_header">Reviews:</string>
+
+    <string name="list_item_author_header">Author:</string>
+    <string name="list_item_content_header">Content:</string>
+
+    <string name="error_message_data_load">Failed to load data</string>
+
+</resources>

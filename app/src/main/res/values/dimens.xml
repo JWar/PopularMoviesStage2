@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="movie_thumbnail_size">125dp</dimen>
+    <dimen name="movie_detail_poster_size">225dp</dimen>
+    <dimen name="activity_main_gridview_spacing">10dp</dimen>
+    <dimen name="activity_main_gridview_column_width">90dp</dimen>
+</resources>
