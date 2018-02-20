@@ -2,6 +2,7 @@ package com.portfolio.udacity.android.popularmoviesstage2.ui;
 
 import android.database.Cursor;
 import android.os.AsyncTask;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -24,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
 
     private MovieRepository mMovieRepository;
     private GridView mGridView;
+    private static final String GRID_VIEW_STATE = "gridViewState";
+    private Parcelable mGridViewState;
     private GetMoviesAsync mGetMoviesAsync;
     private static final String SORT_TYPE = "sortType";
     private String mSortType;
@@ -39,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
         }
         mMovieRepository = MovieRepository.getInstance();
         mGridView = findViewById(R.id.main_activity_gv);
+        mGetMoviesAsync = new GetMoviesAsync();
+        mGetMoviesAsync.execute(mSortType);
     }
 
     @Override
@@ -74,15 +79,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        mGetMoviesAsync = new GetMoviesAsync();
-        mGetMoviesAsync.execute(mSortType);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onDestroy() {
+        super.onDestroy();
         if (mGetMoviesAsync != null) {
             mGetMoviesAsync.cancel(true);
             mGetMoviesAsync = null;
@@ -90,9 +88,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mGridViewState =savedInstanceState.getParcelable(GRID_VIEW_STATE);
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(SORT_TYPE, mSortType);
+        outState.putParcelable(GRID_VIEW_STATE, mGridView.onSaveInstanceState());
     }
 
     //Would never usually do it this way but its quick and dirty and should work! Should be static etc...
@@ -100,34 +105,39 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected List<Movie> doInBackground(String... aStrings) {
             try {
-                List<Movie> movies = NetworkUtils.getMovies(aStrings[0]);
-                //Sigh no better way of checking for favourited Movies than using mSortType?
-                if (movies==null) {return null;}
-                if (mSortType.equals(NetworkUtils.FAVOURITE)) {
-                    Cursor cursor = getContentResolver().query(MoviesContract.FavouritesEntry.CONTENT_URI,
-                            null,
-                            null,
-                            null,
-                            null);
-                    if (cursor != null) {
-                        List<Movie> favouritesList = new ArrayList<>();
-                        if (cursor.getCount()>0) {
-                            while (cursor.moveToNext()) {
-                                int movieId = cursor.getInt(cursor.getColumnIndex(MoviesContract.FavouritesEntry.COLUMN_MOVIE_ID));
-                                for (Movie movie: movies) {
-                                    if (movieId==movie.mId) {
-                                        favouritesList.add(movie);
+                if (!isCancelled()) {
+                    List<Movie> movies = NetworkUtils.getMovies(aStrings[0]);
+                    //Sigh no better way of checking for favourited Movies than using mSortType?
+                    if (movies == null) {
+                        return null;
+                    }
+                    if (mSortType.equals(NetworkUtils.FAVOURITE)) {
+                        Cursor cursor = getContentResolver().query(MoviesContract.FavouritesEntry.CONTENT_URI,
+                                null,
+                                null,
+                                null,
+                                null);
+                        if (cursor != null) {
+                            List<Movie> favouritesList = new ArrayList<>();
+                            if (cursor.getCount() > 0) {
+                                while (cursor.moveToNext()) {
+                                    int movieId = cursor.getInt(cursor.getColumnIndex(MoviesContract.FavouritesEntry.COLUMN_MOVIE_ID));
+                                    for (Movie movie : movies) {
+                                        if (movieId == movie.mId) {
+                                            favouritesList.add(movie);
+                                        }
                                     }
                                 }
                             }
+                            cursor.close();
+                            return favouritesList;
+                        } else {
+                            Toast.makeText(MainActivity.this, getString(R.string.error_message_favourites), Toast.LENGTH_SHORT).show();
                         }
-                        cursor.close();
-                        return favouritesList;
-                    } else {
-                        Toast.makeText(MainActivity.this, getString(R.string.error_message_favourites), Toast.LENGTH_SHORT).show();
                     }
+                    return movies;
                 }
-                return movies;
+                return null;
             } catch (Exception e) {
                 return null;
             }
@@ -146,6 +156,9 @@ public class MainActivity extends AppCompatActivity {
                         GridAdapter gridAdapter = new GridAdapter(MainActivity.this,
                                 mMovieRepository.getMovies());
                         mGridView.setAdapter(gridAdapter);
+                        if (mGridViewState!=null) {
+                            mGridView.onRestoreInstanceState(mGridViewState);
+                        }
                     }
                 }
             }
