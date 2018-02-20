@@ -42,6 +42,9 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
     private static final String MOVIE_ID = "movieId";
 
+    private static final String TRAILER_RV = "trailerRV";
+    private static final String REVIEW_RV = "reviewRV";
+
     private RecyclerView mTrailersRV;
     private RecyclerView mReviewsRV;
 
@@ -221,9 +224,18 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     }
 
     @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mTrailersRV.getLayoutManager().onRestoreInstanceState(savedInstanceState.getParcelable(TRAILER_RV));
+        mReviewsRV.getLayoutManager().onRestoreInstanceState(savedInstanceState.getParcelable(REVIEW_RV));
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(POS,mPosition);
+        outState.putParcelable(TRAILER_RV,mTrailersRV.getLayoutManager().onSaveInstanceState());
+        outState.putParcelable(REVIEW_RV,mReviewsRV.getLayoutManager().onSaveInstanceState());
     }
 
     private static class MovieLoader extends android.support.v4.content.AsyncTaskLoader<Movie> {

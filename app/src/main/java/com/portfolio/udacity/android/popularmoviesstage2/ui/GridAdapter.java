@@ -12,7 +12,6 @@ import android.widget.ImageView;
 import com.portfolio.udacity.android.popularmoviesstage2.NetworkUtils;
 import com.portfolio.udacity.android.popularmoviesstage2.R;
 import com.portfolio.udacity.android.popularmoviesstage2.data.model.Movie;
-import com.portfolio.udacity.android.popularmoviesstage2.ui.DetailActivity;
 import com.squareup.picasso.Picasso;
 import java.util.List;
 

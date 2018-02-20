@@ -39,13 +39,6 @@ public class MainActivity extends AppCompatActivity {
         }
         mMovieRepository = MovieRepository.getInstance();
         mGridView = findViewById(R.id.main_activity_gv);
-        //180217_Does it matter if onClick is here? Or in adapter?
-//        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> aAdapterView, View aView, int aI, long aL) {
-//                DetailActivity.start(aView.getContext(),(int)aView.getTag());
-//            }
-//        });
     }
 
     @Override
