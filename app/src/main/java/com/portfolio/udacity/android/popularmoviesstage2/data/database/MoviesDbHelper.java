@@ -30,7 +30,7 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase aSQLiteDatabase, int aI, int aI1) {
-        aSQLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MoviesContract.FavouritesEntry.TABLE_NAME);
+        aSQLiteDatabase.execSQL("ALTER TABLE " + MoviesContract.FavouritesEntry.TABLE_NAME);
         onCreate(aSQLiteDatabase);
     }
 }
