@@ -1,15 +1,19 @@
 package com.portfolio.udacity.android.popularmoviesstage2.ui;
 
 import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,20 +23,17 @@ import android.widget.Toast;
 
 import com.portfolio.udacity.android.popularmoviesstage2.NetworkUtils;
 import com.portfolio.udacity.android.popularmoviesstage2.R;
+import com.portfolio.udacity.android.popularmoviesstage2.data.database.MoviesContract;
 import com.portfolio.udacity.android.popularmoviesstage2.data.model.Movie;
 import com.portfolio.udacity.android.popularmoviesstage2.data.repository.MovieRepository;
 import com.portfolio.udacity.android.popularmoviesstage2.ui.list.ListHandlerCallback;
 import com.portfolio.udacity.android.popularmoviesstage2.ui.list.RecyclerViewAdapter;
 import com.squareup.picasso.Picasso;
 
+import static com.portfolio.udacity.android.popularmoviesstage2.ui.MainActivity.LOG_TAG;
+
 /**
- * TODO: 180219_Favourites handling:
- * Will need to persist users favourites. Dont want to use a database, use shared preferences.
- * Store a json object stringified. How should the search be handled? Is it ALL the users favourites?
- * Including both lists? Or is it just a favourite from whichever list is selected...
- * Nah it must be ALL favourites, this means when favourites is searched for BOTH lists need to be
- * 'got' then the movie id needs to be found and used in the new grid list.
- *
+ * Handles specific Movie.
  */
 public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Movie> {
 
@@ -63,6 +64,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             }
         }
         mTrailersRV = findViewById(R.id.activity_detail_trailers_rv);
+        mTrailersRV.setLayoutManager(new LinearLayoutManager(mTrailersRV.getContext()));
         mTrailersRV.setAdapter(new RecyclerViewAdapter(new ListHandlerCallback() {
             @Override
             public void onListClick(int aPosition, String aKey) {
@@ -76,6 +78,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         }, R.layout.list_item_trailer));
 
         mReviewsRV = findViewById(R.id.activity_detail_reviews_rv);
+        mReviewsRV.setLayoutManager(new LinearLayoutManager(mReviewsRV.getContext()));
         mReviewsRV.setAdapter(new RecyclerViewAdapter(new ListHandlerCallback() {
             @Override
             public void onListClick(int aPosition, String aId) {
@@ -95,6 +98,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             Movie movie = movieRepository.getMovies().get(mPosition);
             TextView title = findViewById(R.id.activity_detail_title_tv);
             title.setText(movie.mTitle);
+            setTitle(movie.mTitle);
             TextView releaseDate = findViewById(R.id.activity_detail_release_date_tv);
             releaseDate.setText(movie.mReleaseDate);
             TextView voteAverage = findViewById(R.id.activity_detail_vote_average_tv);
@@ -113,6 +117,21 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                             getResources().getDimensionPixelSize(R.dimen.movie_detail_poster_size))
                     .into(poster);
             ImageView favouriteIV = findViewById(R.id.activity_detail_favourite_iv);
+            //Cant really query a database on the UI Thread but in this case I think its fine as its a small
+            //database...
+            Cursor cursor = getContentResolver().query(MoviesContract.FavouritesEntry.CONTENT_URI,
+                    null,
+                    MoviesContract.FavouritesEntry.COLUMN_MOVIE_ID + "=?",
+                    new String[]{movie.mId+""},
+                    null);
+            if (cursor!=null) {
+                if (cursor.getCount() > 0) {//Should always be 1 or 0... but meh.
+                    movie.mFavourite = true;
+                }
+                cursor.close();
+            } else {
+                Toast.makeText(this, getString(R.string.error_message_favourites), Toast.LENGTH_SHORT).show();
+            }
             if (movie.mFavourite) {
                 favouriteIV.setImageResource(R.drawable.ic_star_black_48px);
             } else {
@@ -145,30 +164,21 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         }
         updateFavourites(movie.mFavourite,movie.mId);
     }
-    //Welp this is horrible... faffing about with strings. Does the job though... and avoids database...
     private void updateFavourites(boolean aAddFav, int aMovieId) {
-        SharedPreferences sharedPreferences = getPreferences(0);
-        String csvFavs = sharedPreferences.getString(MainActivity.FAVOURITES,"");
-        if (aAddFav) {//If adding fav then add to csv.
-            if (csvFavs.length()!=0) {
-                csvFavs += "," + aMovieId;
+        try {
+            if (aAddFav) {//Add fav, insert
+                ContentValues cV = new ContentValues();
+                cV.put(MoviesContract.FavouritesEntry.COLUMN_MOVIE_ID,aMovieId);
+                cV.put(MoviesContract.FavouritesEntry.COLUMN_MOVIE_TITLE,getTitle()+"");
+                getContentResolver().insert(MoviesContract.FavouritesEntry.CONTENT_URI,cV);
             } else {
-                csvFavs += aMovieId;
+                getContentResolver().delete(MoviesContract.FavouritesEntry.CONTENT_URI,
+                        MoviesContract.FavouritesEntry.COLUMN_MOVIE_ID + "=?",
+                        new String[]{aMovieId+""});
             }
-            SharedPreferences.Editor edit = sharedPreferences.edit();
-            edit.putString(MainActivity.FAVOURITES,csvFavs);
-            edit.apply();
-        } else {
-            String[] split = csvFavs.split(",");
-            StringBuilder newCsvFavs = new StringBuilder();
-            for (String s: split) {
-                if (Integer.parseInt(s)!=aMovieId) {
-                    newCsvFavs.append(s);
-                }
-            }
-            SharedPreferences.Editor edit = sharedPreferences.edit();
-            edit.putString(MainActivity.FAVOURITES,newCsvFavs.toString());
-            edit.apply();
+        } catch (Exception e) {
+            Log.i(LOG_TAG,"Error in DetailActivity.updateFavourites: "+e.getLocalizedMessage());
+            Toast.makeText(this, getString(R.string.error_message_favourites), Toast.LENGTH_SHORT).show();
         }
     }
     private void watchYoutubeVideo(String aId){
@@ -190,7 +200,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     @Override
     public void onLoadFinished(Loader<Movie> loader, Movie data) {
         if (data!=null&&mReviewsRV!=null&&mTrailersRV!=null) {
-            //TODO:180218_Should I add MovieRepository update of Movie?? Its just those three lines...
             Movie movie = MovieRepository.getInstance().getMovies().get(mPosition);
             movie.mReviews=data.mReviews;
             movie.mTrailers=data.mTrailers;

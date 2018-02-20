@@ -30,7 +30,10 @@ public class Movie extends entity {
     public List<Trailer> mTrailers;
     public List<Review> mReviews;
 
-    public Movie() {}
+    public Movie() {
+        mTrailers=new ArrayList<>();
+        mReviews=new ArrayList<>();
+    }
 
     public Movie(int aId,
                  String aTitle,

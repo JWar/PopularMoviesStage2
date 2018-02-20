@@ -32,8 +32,8 @@ public class NetworkUtils {
     private static final String API_KEY_QUERY = "api_key";
     private static final String JSON_KEY_RESULTS = "results";
 
-    private static final String VIDEOS = "videos?";
-    private static final String REVIEWS = "reviews?";
+    private static final String VIDEOS = "/videos?";
+    private static final String REVIEWS = "/reviews?";
     public static final String TOP_RATED = "top_rated?";
     public static final String POPULAR = "popular?";
     public static final String FAVOURITE = "favourite";
@@ -103,7 +103,6 @@ public class NetworkUtils {
         try {
             String trailerResult = getResponseFromHttpUrl(buildTrailerUrl(aId));
             String reviewResult = getResponseFromHttpUrl(buildReviewUrl(aId));
-
             JSONArray resultsTrailer = new JSONObject(trailerResult).getJSONArray(JSON_KEY_RESULTS);
             JSONArray resultsReview = new JSONObject(reviewResult).getJSONArray(JSON_KEY_RESULTS);
             Movie movie = new Movie();

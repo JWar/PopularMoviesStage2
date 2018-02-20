@@ -21,6 +21,11 @@
         <activity android:name=".ui.DetailActivity"
                   android:parentActivityName=".ui.MainActivity">
         </activity>
+
+        <provider
+            android:name=".data.database.MoviesProvider"
+            android:authorities="@string/content_authority"
+            android:exported="false"/>
     </application>
 
 </manifest>

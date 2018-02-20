@@ -122,6 +122,18 @@
             app:layout_constraintTop_toTopOf="@+id/textView4"/>
 
         <TextView
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:id="@+id/textView10"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/black"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/activity_detail_synopsis_tv"/>
+
+        <TextView
             android:id="@+id/textView8"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -129,15 +141,27 @@
             android:text="@string/activity_detail_trailers_header"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView4"/>
+            app:layout_constraintTop_toBottomOf="@+id/textView10"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/activity_detail_trailers_rv"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="84dp"
             android:layout_marginStart="8dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView8"/>
+
+        <TextView
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:id="@+id/textView11"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/black"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/activity_detail_trailers_rv"/>
 
         <TextView
             android:id="@+id/list_item_content_tv"
@@ -147,12 +171,12 @@
             android:text="@string/activity_detail_reviews_header"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/activity_detail_trailers_rv"/>
+            app:layout_constraintTop_toBottomOf="@+id/textView11"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/activity_detail_reviews_rv"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="148dp"
             android:layout_marginStart="8dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/list_item_content_tv"/>
@@ -167,16 +191,6 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_star_border_black_48px"/>
-
-        <TextView
-            android:id="@+id/textView7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/activity_detail_favourite_footer"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/activity_detail_favourite_iv"/>
 
     </android.support.constraint.ConstraintLayout>
 

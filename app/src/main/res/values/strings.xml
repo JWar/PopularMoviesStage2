@@ -1,5 +1,7 @@
 <resources>
-    <string name="app_name">PopularMovies</string>
+    <string name="app_name">PopularMoviesStage2</string>
+    <string name="content_authority">com.portfolio.udacity.android.popularmoviesstage2</string>
+
     <string name="menu_main_order_by_most_popular">Most Popular</string>
     <string name="menu_main_order_by_highest_rated">Highest Rated</string>
     <string name="menu_main_order_by_favourite">Favourites</string>
@@ -24,5 +26,6 @@
     <string name="list_item_content_header">Content:</string>
 
     <string name="error_message_data_load">Failed to load data</string>
+    <string name="error_message_favourites">Problem accessing Favourites</string>
 
 </resources>
