@@ -25,6 +25,7 @@ public class Movie extends entity {
     public String mPoster;
     public String mVoteAverage;
     public String mSynopsis;
+    public boolean mFavourite=false;
 
     public List<Trailer> mTrailers;
     public List<Review> mReviews;
@@ -36,13 +37,15 @@ public class Movie extends entity {
                  String aReleaseDate,
                  String aPoster,
                  String aVoteAverage,
-                 String aSynopsis) {
+                 String aSynopsis,
+                 boolean aFavourited) {
         mId = aId;
         mTitle = aTitle;
         mReleaseDate = aReleaseDate;
         mPoster = aPoster;
         mVoteAverage = aVoteAverage;
         mSynopsis = aSynopsis;
+        mFavourite=aFavourited;
         mTrailers=new ArrayList<>();
         mReviews=new ArrayList<>();
     }

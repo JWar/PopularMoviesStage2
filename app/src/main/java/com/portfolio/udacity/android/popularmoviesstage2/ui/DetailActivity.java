@@ -3,6 +3,7 @@ package com.portfolio.udacity.android.popularmoviesstage2.ui;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -25,9 +26,13 @@ import com.portfolio.udacity.android.popularmoviesstage2.ui.list.RecyclerViewAda
 import com.squareup.picasso.Picasso;
 
 /**
- * For the moment I am simply getting the data from the MovieRepo and using the
- * arguments position to get the correct movie in the list. Naturally this isnt how you'd properly design
- * it. But that is stage two!
+ * TODO: 180219_Favourites handling:
+ * Will need to persist users favourites. Dont want to use a database, use shared preferences.
+ * Store a json object stringified. How should the search be handled? Is it ALL the users favourites?
+ * Including both lists? Or is it just a favourite from whichever list is selected...
+ * Nah it must be ALL favourites, this means when favourites is searched for BOTH lists need to be
+ * 'got' then the movie id needs to be found and used in the new grid list.
+ *
  */
 public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Movie> {
 
@@ -107,6 +112,19 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                     .resize(getResources().getDimensionPixelSize(R.dimen.movie_detail_poster_size),
                             getResources().getDimensionPixelSize(R.dimen.movie_detail_poster_size))
                     .into(poster);
+            ImageView favouriteIV = findViewById(R.id.activity_detail_favourite_iv);
+            if (movie.mFavourite) {
+                favouriteIV.setImageResource(R.drawable.ic_star_black_48px);
+            } else {
+                favouriteIV.setImageResource(R.drawable.ic_star_border_black_48px);
+            }
+            favouriteIV.setTag(movie.mFavourite);
+            favouriteIV.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View aView) {
+                    toggleFavouriteIV(aView);
+                }
+            });
             Bundle args = new Bundle();
             args.putInt(MOVIE_ID,movie.mId);
             getSupportLoaderManager().initLoader(1,args,this);
@@ -114,7 +132,46 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             Toast.makeText(this, getString(R.string.error_message_data_load), Toast.LENGTH_SHORT).show();
         }
     }
-    public void watchYoutubeVideo(String aId){
+    private void toggleFavouriteIV(View aView) {
+        Movie movie = MovieRepository.getInstance().getMovies().get(mPosition);
+        if ((boolean)aView.getTag()) {
+            ((ImageView)aView).setImageResource(R.drawable.ic_star_border_black_48px);
+            aView.setTag(false);
+            movie.mFavourite=false;
+        } else {
+            ((ImageView)aView).setImageResource(R.drawable.ic_star_black_48px);
+            aView.setTag(true);
+            movie.mFavourite=true;
+        }
+        updateFavourites(movie.mFavourite,movie.mId);
+    }
+    //Welp this is horrible... faffing about with strings. Does the job though... and avoids database...
+    private void updateFavourites(boolean aAddFav, int aMovieId) {
+        SharedPreferences sharedPreferences = getPreferences(0);
+        String csvFavs = sharedPreferences.getString(MainActivity.FAVOURITES,"");
+        if (aAddFav) {//If adding fav then add to csv.
+            if (csvFavs.length()!=0) {
+                csvFavs += "," + aMovieId;
+            } else {
+                csvFavs += aMovieId;
+            }
+            SharedPreferences.Editor edit = sharedPreferences.edit();
+            edit.putString(MainActivity.FAVOURITES,csvFavs);
+            edit.apply();
+        } else {
+            String[] split = csvFavs.split(",");
+            StringBuilder newCsvFavs = new StringBuilder();
+            for (String s: split) {
+                if (Integer.parseInt(s)!=aMovieId) {
+                    newCsvFavs.append(s);
+                }
+            }
+            SharedPreferences.Editor edit = sharedPreferences.edit();
+            edit.putString(MainActivity.FAVOURITES,newCsvFavs.toString());
+            edit.apply();
+        }
+    }
+    private void watchYoutubeVideo(String aId){
         Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + aId));
         Intent webIntent = new Intent(Intent.ACTION_VIEW,
                 Uri.parse("http://www.youtube.com/watch?v=" + aId));

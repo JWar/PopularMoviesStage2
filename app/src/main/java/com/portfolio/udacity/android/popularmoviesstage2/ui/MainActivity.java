@@ -1,5 +1,6 @@
 package com.portfolio.udacity.android.popularmoviesstage2.ui;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,11 +14,13 @@ import com.portfolio.udacity.android.popularmoviesstage2.R;
 import com.portfolio.udacity.android.popularmoviesstage2.data.model.Movie;
 import com.portfolio.udacity.android.popularmoviesstage2.data.repository.MovieRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final String LOG_TAG = "PopularMovies";
+    public static final String FAVOURITES = "favs";
 
     private MovieRepository mMovieRepository;
     private GridView mGridView;
@@ -65,6 +68,12 @@ public class MainActivity extends AppCompatActivity {
                 mGetMoviesAsync = new GetMoviesAsync();
                 mGetMoviesAsync.execute(mSortType);
                 return true;
+            case R.id.action_order_by_favourite:
+                //Make new call to search by both sort orders
+                mSortType=NetworkUtils.FAVOURITE;
+                mGetMoviesAsync = new GetMoviesAsync();
+                mGetMoviesAsync.execute(mSortType);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -97,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected List<Movie> doInBackground(String... aStrings) {
             try {
-                return NetworkUtils.getMoviesOrderBy(aStrings[0]);
+                return NetworkUtils.getMovies(aStrings[0]);
             } catch (Exception e) {
                 return null;
             }
@@ -110,6 +119,27 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, getString(R.string.error_message_data_load), Toast.LENGTH_SHORT).show();
             } else {
                 if (mMovieRepository != null && mGridView != null) {
+                    //Sigh no better way of checking for favourited Movies than using mSortType?
+                    if (mSortType.equals(NetworkUtils.FAVOURITE)) {
+                        //Need to check favourites and create a list containing only them.
+                        //Sigh doing all this in onPostExecute? This is why we never use AsyncTask...
+                        //Get csv string from SharedPreferences. Run through it getting movie using movie id.
+                        SharedPreferences sharedPreferences = getPreferences(0);
+                        String csvFavs= sharedPreferences.getString(FAVOURITES,null);
+                        List<Movie> favouritesList = new ArrayList<>();
+                        if (csvFavs!=null) {
+                            String[] split = csvFavs.split(",");
+                            //Sigh gotta love the double loop
+                            for (String s: split) {
+                                for (Movie movie: aMovies) {
+                                    if (movie.mId==Integer.parseInt(s)) {
+                                        favouritesList.add(movie);
+                                    }
+                                }
+                            }
+                        }
+                        aMovies=favouritesList;//Switch aMovies to favouritesList. If theres no favourites then empty list
+                    }
                     mMovieRepository.setMovies(aMovies);
                     //Ok to use getBaseContext? MainActivity.this?
                     GridAdapter gridAdapter = new GridAdapter(MainActivity.this,

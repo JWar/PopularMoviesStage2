@@ -36,11 +36,29 @@ public class NetworkUtils {
     private static final String REVIEWS = "reviews?";
     public static final String TOP_RATED = "top_rated?";
     public static final String POPULAR = "popular?";
+    public static final String FAVOURITE = "favourite";
 
     //Default search by particular size of w185. Of course can put this as an append if needs be...
     public static final String IMAGE_URL = "http://image.tmdb.org/t/p/w185/";
 
     private static final String API_KEY = BuildConfig.THE_MOVIE_DB_API_TOKEN;
+
+    public static synchronized List<Movie> getMovies(String aOrderBy) throws Exception {
+        switch (aOrderBy) {
+            case NetworkUtils.FAVOURITE:
+                List<Movie> popularList = getMoviesOrderBy(POPULAR);
+                List<Movie> ratedList = getMoviesOrderBy(TOP_RATED);
+                popularList.removeAll(ratedList);//Remove duplicates. Just throwing any exceptions for now..
+                popularList.addAll(ratedList);
+                return popularList;
+            case NetworkUtils.POPULAR:
+                return getMoviesOrderBy(aOrderBy);
+            case NetworkUtils.TOP_RATED:
+                return getMoviesOrderBy(aOrderBy);
+            default:
+                return null;
+        }
+    }
 
     public static synchronized List<Movie> getMoviesOrderBy(String aOrderBy) {
         try {
@@ -55,7 +73,8 @@ public class NetworkUtils {
                         movieObj.optString(Movie.RELEASE_DATE),
                         movieObj.optString(Movie.POSTER_PATH),
                         movieObj.optString(Movie.VOTE_AVERAGE),
-                        movieObj.optString(Movie.OVERVIEW)
+                        movieObj.optString(Movie.OVERVIEW),
+                        false
                 );
                 toReturn.add(movie);
             }
