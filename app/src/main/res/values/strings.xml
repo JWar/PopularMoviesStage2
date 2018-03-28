@@ -28,4 +28,8 @@
     <string name="error_message_data_load">Failed to load data</string>
     <string name="error_message_favourites">Problem accessing Favourites</string>
 
+    <string name="client_detail_tel_type_mobile">Mobile</string>
+    <string name="client_detail_tel_type_home">Home</string>
+    <string name="client_detail_tel_type_work">Work</string>
+
 </resources>

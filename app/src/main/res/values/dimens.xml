@@ -4,4 +4,5 @@
     <dimen name="movie_detail_poster_size">225dp</dimen>
     <dimen name="activity_main_gridview_spacing">10dp</dimen>
     <dimen name="activity_main_gridview_column_width">90dp</dimen>
+    <dimen name="spinner_width">64dp</dimen>
 </resources>

@@ -6,16 +6,33 @@
     android:layout_height="match_parent"
     tools:context="com.portfolio.udacity.android.popularmoviesstage2.ui.MainActivity">
 
-    <GridView
-        android:layout_marginTop="@dimen/activity_main_gridview_spacing"
-        android:id="@+id/main_activity_gv"
+    <!--<GridView-->
+        <!--android:layout_marginTop="@dimen/activity_main_gridview_spacing"-->
+        <!--android:id="@+id/main_activity_gv"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:numColumns="auto_fit"-->
+        <!--android:columnWidth="@dimen/activity_main_gridview_column_width"-->
+        <!--android:verticalSpacing="@dimen/activity_main_gridview_spacing"-->
+        <!--android:horizontalSpacing="@dimen/activity_main_gridview_spacing"-->
+        <!--android:stretchMode="columnWidth"-->
+        <!--android:gravity="center"/>-->
+
+    <Button
+        android:layout_below="@+id/main_activity_app_bar"
+        android:id="@+id/main_activity_add_new_row_button"
+        android:onClick="onAddNewRow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add new Row"/>
+
+    <LinearLayout
+        android:layout_below="@+id/main_activity_add_new_row_button"
+        android:orientation="vertical"
+        android:layout_margin="8dp"
+        android:background="@drawable/border_black"
+        android:id="@+id/main_activity_row_ll"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:numColumns="auto_fit"
-        android:columnWidth="@dimen/activity_main_gridview_column_width"
-        android:verticalSpacing="@dimen/activity_main_gridview_spacing"
-        android:horizontalSpacing="@dimen/activity_main_gridview_spacing"
-        android:stretchMode="columnWidth"
-        android:gravity="center"/>
+        android:layout_height="match_parent"/>
 
 </RelativeLayout>
